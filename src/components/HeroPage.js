@@ -19,6 +19,8 @@ import { useRouter } from "expo-router";
 
 const IMG = {
   heroBg: require("../../assets/images/hero-bg.png"),
+  heroBgMobile: require("../../assets/images/hero-bg-mobile.png"), // ✅ NEW (mobile only)
+
   tjIcon: require("../../assets/images/TJicon.png"),
   clock: require("../../assets/images/clock.png"),
   whatsapp: require("../../assets/images/whatsapp.png"),
@@ -40,16 +42,19 @@ export default function HeroPage() {
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
   // ✅ PHONE-FIRST: on phones keep scale close to 1 (prevents "wonky" spacing)
-  const isPhone = width < 520;
+  const isPhone = width < 420;
   const phoneBase = clamp(width, 320, 420);
   const desktopBase = clamp(width, 420, 980);
-  const scale = isPhone ? phoneBase / 420 : desktopBase / 520; // tighter desktop growth
+  const scale = isPhone ? phoneBase / 410:desktopBase / 520; // tighter desktop growth
+
+  // ✅ ONLY CHANGE: pick bg per device (mobile vs desktop)
+  const heroBgSource = isPhone ? IMG.heroBgMobile : IMG.heroBg;
 
   const S = {
     padX: Math.round(16 * scale),
     maxWrap: 980,
 
-    brandIcon: Math.round(80 * scale),
+    brandIcon: Math.round(100 * scale),
     brandName: Math.round(18 * scale),
     brandTag: Math.round(10 * scale),
 
@@ -117,10 +122,15 @@ export default function HeroPage() {
 
   return (
     <ImageBackground
-      source={IMG.heroBg}
+      source={heroBgSource} // ✅ ONLY CHANGE USED HERE
       style={styles.bg}
       resizeMode="cover"
-      imageStyle={styles.bgImg}
+     imageStyle={[styles.bgImg, isPhone && { resizeMode: "cover", alignSelf: "center",top: 0 }]}
+      bgImg={isPhone && {
+  alignSelf: "center",
+}
+}
+
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -137,13 +147,13 @@ export default function HeroPage() {
           ]}
         >
           {/* ===== BRAND ===== */}
-          <View style={[styles.brandRow, { marginTop: 6 }]}>
+          <View style={[styles.brandRow, { marginTop:2 }]}>
             <Image
               source={IMG.tjIcon}
               style={{
                 width: S.brandIcon,
                 height: S.brandIcon,
-                marginRight: Math.round(10 * scale),
+                marginRight: Math.round(5* scale),
               }}
               resizeMode="contain"
             />
@@ -161,7 +171,7 @@ export default function HeroPage() {
               width: "100%",
               alignItems: "center",
               justifyContent: "center",
-              marginTop: isPhone ? 2 : 4,
+              marginTop: isPhone ? 2 :2,
             }}
           >
             {/* this wrapper forces true centering */}
@@ -183,7 +193,7 @@ export default function HeroPage() {
                   fill="#0B2A3A"
                   fontSize={String(titleMain)}
                   fontWeight="900"
-                  letterSpacing={isPhone ? "-0.5" : "6"}
+                  letterSpacing={isPhone ? "7" : "6"}
                   textAnchor="middle" // ✅ ensure middle
                 >
                   <TextPath
@@ -474,7 +484,7 @@ const styles = StyleSheet.create({
   bgImg: { alignSelf: "center" },
   scroll: {
     flexGrow: 1,
-    paddingTop: 40, // ✅ was 10 (try 18–28)
+    paddingTop:10,// ✅ was 10 (try 18–28)
     paddingBottom: 18,
     alignItems: "center",
   },

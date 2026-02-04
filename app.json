@@ -10,11 +10,13 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "web": { "bundler": "metro" },
     
   "expo": {
     "web": {
       "baseUrl": "/TVDApp"
     }
+    
   }
 
 
