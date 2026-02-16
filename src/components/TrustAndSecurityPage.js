@@ -14,7 +14,6 @@ import {
   Alert,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import WhatsAppButton from "../../src/components/WhatsAppButton"; 
 
 /* ======================================================
    TRUST & SECURITY PAGE (ONE FILE)
@@ -27,19 +26,21 @@ import WhatsAppButton from "../../src/components/WhatsAppButton";
 ====================================================== */
 
 const IMG = {
-  bg: require("../../assets/images/trust-bg.png"),
+
   shield: require("../../assets/images/shield-card.png"),
   taxi: require("../../assets/images/taxi-icon.png"),
   check: require("../../assets/images/check.png"),
 };
 
-export default function TrustAndSecurityPage() {
+/* ======================================================
+   ✅ NEW: Reusable content block (no ScrollView)
+====================================================== */
+function TrustAndSecurityContent() {
   const { width } = useWindowDimensions();
 
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
   // ✅ Make phones the baseline (so Expo Go doesn't shrink everything)
-  // Baseline design width ~420 (common mobile)
   const posterW = clamp(width, 360, 980);
   const rawScale = posterW / 420;
 
@@ -74,120 +75,141 @@ export default function TrustAndSecurityPage() {
   };
 
   return (
+    <View style={S.stage}>
+      <View style={[S.poster, { width: posterW, paddingHorizontal: PADX }]}>
+        {/* ===== TITLE ===== */}
+        <Text
+          allowFontScaling={false}
+          style={[S.title, { fontSize: Math.round(36 * scale) }]}
+        >
+          Fiable et sécurisé.
+        </Text>
+
+        <Text
+          allowFontScaling={false}
+          style={[
+            S.paragraph,
+            {
+              fontSize: Math.round(18 * scale),
+              lineHeight: Math.round(20 * scale),
+            },
+          ]}
+        >
+          Chauffeurs identifiés et vérifiés :{"\n"}
+          votre sécurité est assurée.{"\n\n"}
+          Taxis sélectionnés et contrôlés : vous{"\n"}
+          voyagez en toute tranquillité.
+        </Text>
+
+        {/* ===== CARDS ===== */}
+        <View
+          style={[
+            S.cardsRow,
+            {
+              gap: GAP,
+              marginTop: Math.round(22 * scale),
+              flexDirection: stackCards ? "column" : "row",
+            },
+          ]}
+        >
+          <TrustCard
+            scale={scale}
+            stackCards={stackCards}
+            variant="green"
+            icon={IMG.shield}
+            heading={"Chauffeurs fiables\net identifiés"}
+            bullets={[
+              "Chauffeurs pros, identifiés et vérifiés",
+              "Interventions rapides si nécessaire",
+            ]}
+          />
+
+          <TrustCard
+            scale={scale}
+            stackCards={stackCards}
+            variant="orange"
+            icon={IMG.taxi}
+            heading={"Taxis propres\net confortables"}
+            bullets={[
+              "Taxis sélectionnés et contrôlés",
+              "Gage de confort et de propreté",
+            ]}
+          />
+        </View>
+
+        {/* ===== BOTTOM ===== */}
+        <View style={[S.bottom, { marginTop: Math.round(22 * scale) }]}>
+          <Text
+            allowFontScaling={false}
+            style={[
+              S.bottomPara,
+              {
+                fontSize: Math.round(18 * scale),
+                lineHeight: Math.round(18 * scale),
+              },
+            ]}
+          >
+            TJ-DV s’engage pour votre tranquillité{"\n"}et votre bien-être.
+          </Text>
+
+          <TouchableOpacity
+            style={[
+              S.whatsappButton,
+              {
+                marginTop: Math.round(14 * scale),
+                paddingVertical: Math.round(12 * scale),
+                paddingHorizontal: Math.round(28 * scale),
+              },
+            ]}
+            activeOpacity={0.85}
+            onPress={openWhatsApp}
+          >
+            <Text
+              allowFontScaling={false}
+              style={[S.whatsappText, { fontSize: Math.round(16 * scale) }]}
+            >
+              Réserver sur WhatsApp
+            </Text>
+          </TouchableOpacity>
+
+          <Text
+            allowFontScaling={false}
+            style={[S.paymentNote, { marginTop: Math.round(10 * scale) }]}
+          >
+            Paiement uniquement après la course
+          </Text>
+        </View>
+
+        <View style={{ height: 28 }} />
+      </View>
+    </View>
+  );
+}
+
+/* ======================================================
+   ✅ Default page export (kept same behavior)
+====================================================== */
+export default function TrustAndSecurityPage() {
+  return (
     <ImageBackground source={IMG.bg} style={S.page} resizeMode="cover">
       <ScrollView
         contentContainerStyle={S.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={S.stage}>
-          <View style={[S.poster, { width: posterW, paddingHorizontal: PADX }]}>
-            {/* ===== TITLE ===== */}
-            <Text
-              allowFontScaling={false}
-              style={[S.title, { fontSize: Math.round(34 * scale) }]}
-            >
-              Fiable et sécurisé.
-            </Text>
-
-            <Text
-              allowFontScaling={false}
-              style={[
-                S.paragraph,
-                {
-                  fontSize: Math.round(14 * scale),
-                  lineHeight: Math.round(20 * scale),
-                },
-              ]}
-            >
-              Chauffeurs identifiés et vérifiés :{"\n"}
-              votre sécurité est assurée.{"\n\n"}
-              Taxis sélectionnés et contrôlés : vous{"\n"}
-              voyagez en toute tranquillité.
-            </Text>
-
-            {/* ===== CARDS ===== */}
-            <View
-              style={[
-                S.cardsRow,
-                {
-                  gap: GAP,
-                  marginTop: Math.round(22 * scale),
-                  flexDirection: stackCards ? "column" : "row",
-                },
-              ]}
-            >
-              <TrustCard
-                scale={scale}
-                stackCards={stackCards}
-                variant="green"
-                icon={IMG.shield}
-                heading={"Chauffeurs fiables\net identifiés"}
-                bullets={[
-                  "Chauffeurs pros, identifiés et vérifiés",
-                  "Interventions rapides si nécessaire",
-                ]}
-              />
-
-              <TrustCard
-                scale={scale}
-                stackCards={stackCards}
-                variant="orange"
-                icon={IMG.taxi}
-                heading={"Taxis propres\net confortables"}
-                bullets={[
-                  "Taxis sélectionnés et contrôlés",
-                  "Gage de confort et de propreté",
-                ]}
-              />
-            </View>
-
-            {/* ===== BOTTOM ===== */}
-            <View style={[S.bottom, { marginTop: Math.round(22 * scale) }]}>
-              <Text
-                allowFontScaling={false}
-                style={[
-                  S.bottomPara,
-                  {
-                    fontSize: Math.round(14 * scale),
-                    lineHeight: Math.round(18 * scale),
-                  },
-                ]}
-              >
-                TJ-DV s’engage pour votre tranquillité{"\n"}et votre bien-être.
-              </Text>
-
-              <TouchableOpacity
-                style={[
-                  S.whatsappButton,
-                  {
-                    marginTop: Math.round(14 * scale),
-                    paddingVertical: Math.round(12 * scale),
-                    paddingHorizontal: Math.round(28 * scale),
-                  },
-                ]}
-                activeOpacity={0.85}
-                onPress={openWhatsApp} // ✅ ADDED
-              >
-                <Text
-                  allowFontScaling={false}
-                  style={[S.whatsappText, { fontSize: Math.round(16 * scale) }]}
-                >
-                  Réserver sur WhatsApp
-                </Text>
-              </TouchableOpacity>
-
-              <Text
-                allowFontScaling={false}
-                style={[S.paymentNote, { marginTop: Math.round(10 * scale) }]}
-              >
-                Paiement uniquement après la course
-              </Text>
-            </View>
-
-            <View style={{ height: 28 }} />
-          </View>
-        </View>
+        <TrustAndSecurityContent />
       </ScrollView>
+    </ImageBackground>
+  );
+}
+
+/* ======================================================
+   ✅ NEW: Embedded section export (for HeroPage)
+   - No ScrollView (important)
+====================================================== */
+export function TrustAndSecuritySection() {
+  return (
+    <ImageBackground source={IMG.bg} style={S.embedBg} resizeMode="cover">
+      <TrustAndSecurityContent />
     </ImageBackground>
   );
 }
@@ -204,14 +226,12 @@ function TrustCard({ scale, stackCards, icon, heading, bullets, variant }) {
   const WAVE_H = 60;
 
   // ✅ Same icon BOX for both cards (so they match)
-  const ICON_BOX = Math.round(110 * scale);
+  const ICON_BOX = Math.round(150 * scale);
 
   // ✅ Taxi PNG usually has more empty padding → visually smaller
-  // We scale the taxi INSIDE the same box (not changing layout sizing).
   const iconInnerScale = isTaxi ? 1.18 : 1.0;
 
   // ✅ Put icons on the same horizontal line near the wave
-  // Center of icon slightly above wave.
   const iconCenterY =
     TOP_H - Math.round(WAVE_H * 0.55) - Math.round(ICON_BOX * 0.15);
 
@@ -387,6 +407,14 @@ const S = StyleSheet.create({
     width: "100%",
     minHeight: Platform.OS === "web" ? "100vh" : "100%",
   },
+
+  // ✅ NEW: for embedding inside HeroPage (no "full page" sizing)
+  embedBg: {
+    width: "100%",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+
   scroll: { paddingBottom: 30 },
   stage: { width: "100%", alignItems: "center", paddingTop: 26 },
   poster: { alignItems: "center" },
@@ -499,11 +527,17 @@ const S = StyleSheet.create({
     justifyContent: "center",
     marginTop: 1,
   },
-  bulletText: { flex: 1, fontWeight: "700", color: "#0B2A3A" },
+  bulletText: { flex: 1, fontWeight: "900", color: "#0B2A3A" , fontSize: 60},
 
   bottom: { width: "100%", alignItems: "center" },
   bottomPara: { textAlign: "center", fontWeight: "900", color: "#0B2A3A" },
+  heading:{
+    fontSize: 15
+  },
 
+  bullets: {
+    fontSize: 13
+  },
   whatsappButton: {
     backgroundColor: "#1DB954",
     borderRadius: 999,

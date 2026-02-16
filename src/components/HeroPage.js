@@ -1,4 +1,4 @@
-// src/components/HeroPage.js  (REPLACE ENTIRE FILE)
+// src/components/HeroPage.js
 
 import React from "react";
 import {
@@ -11,15 +11,17 @@ import {
   Platform,
   ScrollView,
   useWindowDimensions,
-  Linking, // ✅ WhatsApp redirect
+  Linking,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Path, Text as SvgText, TextPath } from "react-native-svg";
 import { useRouter } from "expo-router";
 
+import { TrustAndSecuritySection } from "../components/TrustAndSecurityPage";
+
 const IMG = {
   heroBg: require("../../assets/images/hero-bg.png"),
-  heroBgMobile: require("../../assets/images/hero-bg-mobile.png"), // ✅ NEW (mobile only)
+  heroBgMobile: require("../../assets/images/hero-bg-mobile.png"),
 
   tjIcon: require("../../assets/images/TJicon.png"),
   clock: require("../../assets/images/clock.png"),
@@ -35,40 +37,39 @@ const IMG = {
 };
 
 export default function HeroPage() {
-  const { width } = useWindowDimensions();
-  const router = useRouter(); // ✅ NEW: navigation
-  const T = (props) => <Text allowFontScaling={false} {...props} />;
+  const { width, height } = useWindowDimensions();
+  const router = useRouter();
+ const T = (props) => <Text allowFontScaling={false} style={{ fontFamily: 'System' }} {...props} />;
 
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
-  // ✅ PHONE-FIRST: on phones keep scale close to 1 (prevents "wonky" spacing)
   const isPhone = width < 420;
   const phoneBase = clamp(width, 320, 420);
   const desktopBase = clamp(width, 420, 980);
-  const scale = isPhone ? phoneBase / 410:desktopBase / 520; // tighter desktop growth
+  const scale = isPhone ? phoneBase / 410 : desktopBase / 520;
 
-  // ✅ ONLY CHANGE: pick bg per device (mobile vs desktop)
+  const m = isPhone ? 0.92 : 1;
   const heroBgSource = isPhone ? IMG.heroBgMobile : IMG.heroBg;
 
   const S = {
     padX: Math.round(16 * scale),
     maxWrap: 980,
 
-    brandIcon: Math.round(100 * scale),
-    brandName: Math.round(18 * scale),
-    brandTag: Math.round(10 * scale),
+    brandIcon: Math.round(100 * scale * (isPhone ? 1.35 : 1)),
+    brandName: Math.round(18 * scale * (isPhone ? 1.25 : 1)),
+    brandTag: Math.round(10 * scale * (isPhone ? 1.25 : 1)),
 
-    desc: Math.round(12.8 * scale),
-    descLine: Math.round(18 * scale),
+    desc: Math.round(12.8 * scale * m),
+    descLine: Math.round(18 * scale * m),
 
-    pillText: Math.round(12 * scale),
-    pillPadY: Math.round(8 * scale),
-    pillPadX: Math.round(14 * scale),
+    pillText: Math.round(12 * scale * (isPhone ? 1.12 : 1)),
+    pillPadY: Math.round(8 * scale * (isPhone ? 1.1 : 1)),
+    pillPadX: Math.round(14 * scale * (isPhone ? 1.05 : 1)),
 
-    ctaText: Math.round(15 * scale),
-    ctaPadY: Math.round(13 * scale),
+    ctaText: Math.round(15 * scale * (isPhone ? 1.08 : 1)),
+    ctaPadY: Math.round(13 * scale * (isPhone ? 1.08 : 1)),
 
-    featureIcon: Math.round(34 * scale),
+    featureIcon: Math.round(100 * scale),
     featureText: Math.round(11.5 * scale),
 
     radiusPanel: Math.round(20 * scale),
@@ -76,40 +77,36 @@ export default function HeroPage() {
 
     cardTitle: Math.round(16.5 * scale),
 
-    stepIcon: Math.round(46 * scale),
-    stepText: Math.round(11.5 * scale),
+    stepIcon: Math.round(100 * scale),
+    stepText: Math.round(15.5 * scale),
 
     foot: Math.round(12.5 * scale),
   };
 
-  // ✅ SVG sizing
-  // ✅ Mobile curve tuned (desktop unchanged)
-  const svgH = isPhone ? 120 : Math.round(110 * scale);
+  const titleMain = isPhone ? 76 : Math.round(38 * scale);
+  const titleCity = isPhone ? 45 : 34;
+  const svgH = isPhone ? 140 : Math.round(110 * scale);
 
-  // bigger + cleaner on mobile, desktop unchanged
-  const titleMain = isPhone ? 50 : Math.round(38 * scale);
-  const titleCity = isPhone ? 30 : 34;
-
-  // ✅ blue line aligns to icon centers (not too low)
   const blueTop = Math.round(S.stepIcon * 0.45);
-
   const posterW = clamp(width, 360, 980);
 
-  // ======================================================
-  // ✅ WhatsApp Redirect (EDIT THESE TWO VALUES ONLY)
-  // - phone in international format, no +, no spaces
-  //   example Cameroon: "237699999999"
-  // ======================================================
-  const WA_NUMBER = "237679695205"; // 🔁 CHANGE THIS
-  const WA_MESSAGE = "Bonjour "; // 🔁 CHANGE THIS
+  const mobileHeroWrap = isPhone
+    ? {
+        minHeight: Math.round(height * 0.60),
+        paddingTop: 8,
+        paddingBottom: 8,
+        justifyContent: "flex-start",
+        alignItems: "center",
+        width: "100%",
+      }
+    : null;
+
+  const WA_NUMBER = "237679695205";
+  const WA_MESSAGE = "Bonjour ";
 
   const openWhatsApp = async () => {
     const text = encodeURIComponent(WA_MESSAGE);
-
-    // Preferred on phones (opens app)
     const appUrl = `whatsapp://send?phone=${WA_NUMBER}&text=${text}`;
-
-    // Works on desktop and as fallback
     const webUrl = `https://wa.me/${WA_NUMBER}?text=${text}`;
 
     try {
@@ -122,15 +119,18 @@ export default function HeroPage() {
 
   return (
     <ImageBackground
-      source={heroBgSource} // ✅ ONLY CHANGE USED HERE
+      source={heroBgSource}
       style={styles.bg}
       resizeMode="cover"
-     imageStyle={[styles.bgImg, isPhone && { resizeMode: "cover", alignSelf: "center",top: 0 }]}
-      bgImg={isPhone && {
-  alignSelf: "center",
-}
-}
-
+      imageStyle={[
+        styles.bgImg,
+        isPhone && {
+          resizeMode: "cover",
+          alignSelf: "center",
+          top: -24,
+          transform: [{ scale: 1.05 }],
+        },
+      ]}
     >
       <ScrollView
         contentContainerStyle={styles.scroll}
@@ -143,191 +143,235 @@ export default function HeroPage() {
               width: posterW,
               maxWidth: S.maxWrap,
               paddingHorizontal: S.padX,
+              alignSelf: "center",
             },
           ]}
         >
-          {/* ===== BRAND ===== */}
-          <View style={[styles.brandRow, { marginTop:2 }]}>
-            <Image
-              source={IMG.tjIcon}
-              style={{
-                width: S.brandIcon,
-                height: S.brandIcon,
-                marginRight: Math.round(5* scale),
-              }}
-              resizeMode="contain"
-            />
-            <View style={{ alignItems: "flex-start" }}>
-              <T style={[styles.brandName, { fontSize: S.brandName }]}>TJ-DV</T>
-              <T style={[styles.brandTag, { fontSize: S.brandTag }]}>
-                Taxi Jeune sur Rendez-Vous
-              </T>
+          {/* HERO TOP AREA */}
+          <View style={mobileHeroWrap}>
+            {/* BRAND */}
+            <View style={[styles.brandRow, { marginTop: isPhone ? 2 : 2 }]}>
+              <Image
+                source={IMG.tjIcon}
+                style={{
+                  width: S.brandIcon,
+                  height: S.brandIcon,
+                  marginRight: Math.round(8 * scale),
+                }}
+                resizeMode="contain"
+              />
+              <View style={{ alignItems: "flex-start" }}>
+                <T style={[styles.brandName, { fontSize: S.brandName }]}>
+                  TJ-DV
+                </T>
+                <T style={[styles.brandTag, { fontSize: S.brandTag }]}>
+                  Taxi Jeune sur Rendez-Vous
+                </T>
+              </View>
             </View>
-          </View>
 
-          {/* ===== CURVED TITLE (CENTERED) ===== */}
-          <View
-            style={{
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: isPhone ? 2 :2,
-            }}
-          >
-            {/* this wrapper forces true centering */}
-            <View style={{ width: "100%", alignItems: "center" }}>
-              <Svg
-                width="100%"
-                height={svgH}
-                viewBox="0 0 1100 260"
-                preserveAspectRatio="xMidYMid meet"
-                style={{ alignSelf: "center" }} // ✅ important
-              >
-                <Path
-                  id="curve"
-                  d={isPhone ? "M 40 200 Q 550 60 1060 200" : "M 20 205 Q 550 105 1080 205"}
-                  fill="transparent"
-                />
-
-                <SvgText
-                  fill="#0B2A3A"
-                  fontSize={String(titleMain)}
-                  fontWeight="900"
-                  letterSpacing={isPhone ? "7" : "6"}
-                  textAnchor="middle" // ✅ ensure middle
+            {/* TITLE */}
+            {isPhone ? (
+              <View style={{ 
+                width: "100%", 
+                alignItems: "center", 
+                marginTop: 8,
+                marginBottom: 4,
+              }}>
+                <Text
+                  allowFontScaling={false}
+                  style={{
+                    fontSize: 48,
+                    fontWeight: "900",
+                    color: "#0B2A3A",
+                    textAlign: "center",
+                    lineHeight: 52,
+                    letterSpacing: -0.5,
+                    width: "100%",
+                    flexShrink: 1,
+                    paddingHorizontal: 0,
+                    fontFamily: 'System',
+                  }}
+                  numberOfLines={2}
+                  adjustsFontSizeToFit={false}
                 >
-                  <TextPath
-                    href="#curve"
-                    xlinkHref="#curve"
-                    startOffset="50%"
-                    textAnchor="middle" // ✅ ensure middle
-                    method="align" // ✅ better centering on some phones
-                    spacing="auto"
-                  >
-                    Un taxi, sur rendez-vous.
-                  </TextPath>
-                </SvgText>
+                  Un taxi, sur rendez-vous.
+                </Text>
 
-                <SvgText
-                  x="550"
-                  y={isPhone ? "238" : "225"}
-                  textAnchor="middle"
-                  fill="#E71E6F"
-                  fontSize={String(titleCity)}
-                  fontWeight="900"
+                <Text
+                  allowFontScaling={false}
+                  style={{
+                    marginTop: 2,
+                    fontSize: 36,
+                    fontWeight: "900",
+                    color: "#E71E6F",
+                    textAlign: "center",
+                    lineHeight: 42,
+                    fontFamily: 'System',
+                  }}
+                  numberOfLines={1}
                 >
                   à Yaoundé
-                </SvgText>
-              </Svg>
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 2,
+                }}
+              >
+                <View style={{ width: "100%", alignItems: "center" }}>
+                  <Svg
+                    width="100%"
+                    height={svgH}
+                    viewBox="0 0 1100 260"
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{ alignSelf: "center" }}
+                  >
+                    <Path
+                      id="curve"
+                      d={"M 20 205 Q 550 105 1080 205"}
+                      fill="transparent"
+                    />
+
+                    <SvgText
+                      fill="#0B2A3A"
+                      fontSize={String(Math.round(38 * scale))}
+                      fontWeight="900"
+                      letterSpacing={"6"}
+                      textAnchor="middle"
+                    >
+                      <TextPath
+                        href="#curve"
+                        xlinkHref="#curve"
+                        startOffset="50%"
+                        textAnchor="middle"
+                        method="align"
+                        spacing="auto"
+                      >
+                        Un taxi, sur rendez-vous.
+                      </TextPath>
+                    </SvgText>
+
+                    <SvgText
+                      x="550"
+                      y={"225"}
+                      textAnchor="middle"
+                      fill="#E71E6F"
+                      fontSize={String(34)}
+                      fontWeight="900"
+                    >
+                      à Yaoundé
+                    </SvgText>
+                  </Svg>
+                </View>
+              </View>
+            )}
+
+            {/* DESCRIPTION */}
+            <T
+              style={[
+                styles.desc,
+                {
+                  fontSize: isPhone ? 18 : S.desc,
+                  lineHeight: isPhone ? 26 : S.descLine,
+                  textAlign: "center",
+                  alignSelf: "center",
+                  width: isPhone ? "100%" : "auto",
+                  marginTop: isPhone ? 16 : 8,
+                  marginBottom: isPhone ? 8 : 0,
+                  paddingHorizontal: isPhone ? 4 : 0,
+                },
+              ]}
+            >
+              Course planifiée pour vos déplacements importants.{"\n"}
+              Vous indiquez le lieu, la destination et l&apos;heure.{"\n"}
+              Un opérateur organise le départ.
+            </T>
+
+            {/* PILL */}
+            <View
+              style={[
+                styles.pill,
+                {
+                  marginTop: isPhone ? 16 : 10,
+                  paddingVertical: S.pillPadY,
+                  paddingHorizontal: S.pillPadX,
+                  alignSelf: "center",
+                },
+              ]}
+            >
+              <Image
+                source={IMG.clock}
+                style={{
+                  width: Math.round(18 * scale * (isPhone ? 1.08 : 1)),
+                  height: Math.round(18 * scale * (isPhone ? 1.08 : 1)),
+                  marginRight: Math.round(8 * scale),
+
+                }}
+                resizeMode="cover"
+              />
+
+              <T style={[styles.pillText, { fontSize: S.pillText } ,{ textAlign: "center" }]}>
+                Réservation au moins 1 heure à l&apos;avance
+              </T>
             </View>
-          </View>
 
-          {/* ===== DESCRIPTION (TIGHTER) ===== */}
-          <T
-            style={[
-              styles.desc,
-              {
-                fontSize: S.desc,
-                lineHeight: S.descLine,
-                marginTop: isPhone ? 4 : 8,
-              },
-            ]}
-          >
-            Course planifiée pour vos déplacements importants.{"\n"}
-            Vous indiquez le lieu, la destination et l&apos;heure.{"\n"}
-            Un opérateur organise le départ.
-          </T>
-
-          {/* ===== PILL ===== */}
-          <View
-            style={[
-              styles.pill,
-              {
-                marginTop: isPhone ? 10 : 12,
-                paddingVertical: S.pillPadY,
-                paddingHorizontal: S.pillPadX,
-              },
-            ]}
-          >
-            <Image
-              source={IMG.clock}
+            {/* CTA */}
+            {isPhone && <View style={{ height: 12 }} />}
+            <Pressable
               style={{
-                width: Math.round(18 * scale),
-                height: Math.round(18 * scale),
-                marginRight: Math.round(8 * scale),
+                width: isPhone ? "90%" : "92%",
+                marginTop: isPhone ? 16 : 12,
+                alignSelf: "center",
               }}
-              resizeMode="contain"
-            />
-            <T style={[styles.pillText, { fontSize: S.pillText }]}>
-              Réservation au moins 1 heure à l&apos;avance
+              onPress={openWhatsApp}
+            >
+              <LinearGradient
+                colors={["#39D97B", "#1FBF5D"]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={[
+                  styles.cta,
+                  { paddingVertical: S.ctaPadY, borderRadius: 999 },
+                ]}
+              >
+                <View style={styles.ctaInner}>
+                  <View
+                    style={[
+                      styles.ctaIconCircle,
+                      {
+                        width: Math.round(38 * scale * (isPhone ? 1.08 : 1)),
+                        height: Math.round(38 * scale * (isPhone ? 1.08 : 1)),
+                        marginRight: Math.round(10 * scale),
+                      },
+                    ]}
+                  >
+                    <Image
+                      source={IMG.whatsapp}
+                      style={{
+                        width: Math.round(20 * scale * (isPhone ? 1.08 : 1)),
+                        height: Math.round(20 * scale * (isPhone ? 1.08 : 1)),
+                      }}
+                      resizeMode="contain"
+                    />
+                  </View>
+                  <T style={[styles.ctaText, { fontSize: S.ctaText }]}>
+                    Réserver sur WhatsApp
+                  </T>
+                </View>
+              </LinearGradient>
+            </Pressable>
+
+            <T style={[styles.payment, { marginTop: 10, fontSize: 12, textAlign: "center" }]}>
+              💰 Paiement uniquement après la course
             </T>
           </View>
 
-          {/* ===== CTA (NOW OPENS WHATSAPP) ===== */}
-          <Pressable
-            style={{ width: "92%", marginTop: isPhone ? 10 : 12 }}
-            onPress={openWhatsApp}
-          >
-            <LinearGradient
-              colors={["#39D97B", "#1FBF5D"]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={[styles.cta, { paddingVertical: S.ctaPadY }]}
-            >
-              <View style={styles.ctaInner}>
-                <View
-                  style={[
-                    styles.ctaIconCircle,
-                    {
-                      width: Math.round(38 * scale),
-                      height: Math.round(38 * scale),
-                      marginRight: Math.round(10 * scale),
-                    },
-                  ]}
-                >
-                  <Image
-                    source={IMG.whatsapp}
-                    style={{
-                      width: Math.round(20 * scale),
-                      height: Math.round(20 * scale),
-                    }}
-                    resizeMode="contain"
-                  />
-                </View>
-                <T style={[styles.ctaText, { fontSize: S.ctaText }]}>
-                  Réserver sur WhatsApp
-                </T>
-              </View>
-            </LinearGradient>
-          </Pressable>
-
-          <T style={[styles.payment, { marginTop: 8, fontSize: 12 }]}>
-            💰 Paiement uniquement après la course
-          </T>
-
-          {/* ✅ NEW: use existing buttons to go to Trust & Security page */}
-          <Pressable
-            style={{ width: "92%", marginTop: 10 }}
-            onPress={() => router.push("/trust")}
-          >
-            <View
-              style={{
-                borderRadius: 999,
-                paddingHorizontal: 14,
-                paddingVertical: 10,
-                borderWidth: 2,
-                borderColor: "rgba(255,255,255,0.8)",
-                backgroundColor: "rgba(226, 233, 218, 0.55)",
-                alignItems: "center",
-              }}
-            >
-              <Text allowFontScaling={false} style={{ fontWeight: "900", color: "#0B2A3A" }}>
-                Fiable & sécurisé
-              </Text>
-            </View>
-          </Pressable>
-
-          {/* ===== PANEL GROUP (LESS PADDING ON PHONE) ===== */}
+          {/* PANEL GROUP - FIXED: "Comment ça marche" now OUTSIDE the white card */}
           <View
             style={[
               styles.panelGroup,
@@ -351,34 +395,83 @@ export default function HeroPage() {
               style={[styles.panelInnerGlow, { borderRadius: S.radiusPanel }]}
             />
 
-            {/* ===== FEATURES (COMPACT ROW) ===== */}
-            <View style={[styles.featureRow, { marginTop: 2 }]}>
-              <Feature
-                icon={IMG.taxi}
-                text={"Départ planifié,\nsans stress"}
-                S={S}
-                scale={scale}
-                T={T}
-              />
-              <Feature
-                icon={IMG.driver}
-                text={"Chauffeurs\nsélectionnés"}
-                S={S}
-                scale={scale}
-                T={T}
-              />
-              <Feature
-                icon={IMG.handshake}
-                text={"Service\nlocal et humain"}
-                S={S}
-                scale={scale}
-                T={T}
-              />
+            {/* FEATURES SECTION */}
+            <View
+              style={[
+                styles.featuresWhiteBox,
+                isPhone
+                  ? { paddingVertical: 14, paddingHorizontal: 12 }
+                  : { paddingVertical: 12, paddingHorizontal: 14 },
+              ]}
+            >
+              <View
+                style={[
+                  styles.featureRow,
+                  {
+                    flexDirection: isPhone ? "column" : "row",
+                    alignItems: isPhone ? "flex-start" : "center",
+                    justifyContent: isPhone ? "flex-start" : "center",
+                    gap: isPhone ? 14 : 40,
+                    paddingLeft: isPhone ? 6 : 0,
+                    paddingRight: isPhone ? 6 : 0,
+                  },
+                ]}
+              >
+                <Feature 
+                  icon={IMG.taxi} 
+                  text={"Départ planifié,\nsans stress"} 
+                  S={S} 
+                  scale={scale} 
+                  T={T} 
+                  isPhone={isPhone} 
+                  isLast={false}
+                />
+                <Feature 
+                  icon={IMG.driver} 
+                  text={"Chauffeurs\nsélectionnés"} 
+                  S={S} 
+                  scale={scale} 
+                  T={T} 
+                  isPhone={isPhone} 
+                  isLast={false} 
+                />
+                <Feature 
+                  icon={IMG.handshake} 
+                  text={"Service\nlocal et humain"} 
+                  S={S} 
+                  scale={scale} 
+                  T={T} 
+                  isPhone={isPhone} 
+                  isLast={true}
+                />
+              </View>
             </View>
 
             <View style={[styles.pinkDotsLine, { marginTop: 8, marginBottom: 10 }]} />
 
-            {/* ===== COMMENT ÇA MARCHE CARD ===== */}
+            {/* "COMMENT ÇA MARCHE" TITLE - NOW OUTSIDE THE WHITE CARD */}
+            <View style={[styles.cardTitleRow, { marginBottom: isPhone ? 8 : 10 }]}>
+            
+              <T 
+                style={[
+                  styles.cardTitle, 
+                  { 
+                    fontSize: isPhone ? S.cardTitle * 1.5 : S.cardTitle * 1.5, 
+                    textAlign: "center", 
+                    marginHorizontal: 4,
+                    flexShrink: 1,
+                  }
+                ]}
+               
+                adjustsFontSizeToFit={false}
+              >
+             
+                Comment ça marche ?
+              </T>
+              
+            </View>
+
+            {/* STEPS CARD - WHITE BACKGROUND ONLY FOR STEPS */}
             <LinearGradient
               colors={["rgba(255,255,255,0.78)", "rgba(255,244,220,0.90)"]}
               start={{ x: 0.5, y: 0 }}
@@ -394,30 +487,74 @@ export default function HeroPage() {
             >
               <View style={[styles.cardInnerGlow, { borderRadius: S.radiusCard }]} />
 
-              <View style={[styles.cardTitleRow, { marginBottom: isPhone ? 6 : 8 }]}>
-                <View style={[styles.shortPinkLine, { width: Math.round(56 * scale) }]} />
-                <T style={[styles.cardTitle, { fontSize: S.cardTitle }]}>Comment ça marche</T>
-                <View style={[styles.shortPinkLine, { width: Math.round(56 * scale) }]} />
-              </View>
-
               <View style={{ width: "100%", position: "relative", paddingTop: 4 }}>
-                <View
-                  style={[
-                    styles.blueLine,
-                    {
-                      top: blueTop,
-                      left: Math.round(12 * scale),
-                      right: Math.round(12 * scale),
-                      height: Math.max(2, Math.round(3 * scale)),
-                    },
-                  ]}
-                />
+                {isPhone ? (
+                  <View style={{ width: "100%", marginTop: 6 }}>
+                    {/* STEP 1 */}
+                    <View style={styles.stepVRow}>
+                      <View style={[styles.stepVCircle, { width: Math.round(48 * scale), height: Math.round(48 * scale) }]}>
+                        <Image
+                          source={IMG.messenger}
+                          resizeMode="contain"
+                          style={{ width: Math.round(150 * scale * 0.62), height: Math.round(150 * scale * 0.62) }}
+                        />
+                      </View>
+                      <T style={[styles.stepVText, { fontSize: Math.round(16 * scale) }]}>
+                        1. Écrivez sur WhatsApp
+                      </T>
+                    </View>
+                    <View style={styles.stepDivider} />
 
-                <View style={styles.stepsRow}>
-                  <Step icon={IMG.messenger} label={"1. Écrivez sur\nWhatsApp"} S={S} T={T} />
-                  <Step icon={IMG.location} label={"2. Indiquez lieu\n& destination"} S={S} T={T} />
-                  <Step icon={IMG.check} label={"3. L'opérateur\nconfirme"} S={S} T={T} />
-                </View>
+                    {/* STEP 2 */}
+                    <View style={styles.stepVRow}>
+                      <View style={[styles.stepVCircle, { width: Math.round(48 * scale), height: Math.round(48 * scale) }]}>
+                        <Image
+                          source={IMG.location}
+                          resizeMode="contain"
+                          style={{ width: Math.round(150 * scale * 0.62), height: Math.round(150 * scale * 0.62) }}
+                        />
+                      </View>
+                      <T style={[styles.stepVText, { fontSize: Math.round(16 * scale) }]}>
+                        2. Indiquez lieu & destination
+                      </T>
+                    </View>
+                    <View style={styles.stepDivider} />
+
+                    {/* STEP 3 */}
+                    <View style={styles.stepVRow}>
+                      <View style={[styles.stepVCircle, { width: Math.round(48 * scale), height: Math.round(48 * scale) }]}>
+                        <Image
+                          source={IMG.check}
+                          resizeMode="contain"
+                          style={{ width: Math.round(150 * scale * 0.62), height: Math.round(150 * scale * 0.62) }}
+                        />
+                      </View>
+                      <T style={[styles.stepVText, { fontSize: Math.round(16 * scale) }]}>
+                        3. L&apos;opérateur confirme
+                      </T>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={{ width: "100%", position: "relative", paddingTop: 4 }}>
+                    <View
+                      style={[
+                        styles.blueLine,
+                        {
+                          top: blueTop,
+                          left: Math.round(12 * scale),
+                          right: Math.round(12 * scale),
+                          height: Math.max(2, Math.round(3 * scale)),
+                        },
+                      ]}
+                    />
+
+                    <View style={styles.stepsRow}>
+                      <Step icon={IMG.messenger} label={"1. Écrivez sur\nWhatsApp"} S={S} T={T} />
+                      <Step icon={IMG.location} label={"2. Indiquez lieu\n& destination"} S={S} T={T} />
+                      <Step icon={IMG.check} label={"3. L'opérateur\nconfirme"} S={S} T={T} />
+                    </View>
+                  </View>
+                )}
               </View>
 
               <T style={[styles.cardFoot, { fontSize: S.foot, marginTop: 10 }]}>
@@ -426,7 +563,10 @@ export default function HeroPage() {
             </LinearGradient>
           </View>
 
-          {/* ===== FOOTER ===== */}
+          <View style={{ marginTop: 16, width: "100%" }}>
+            <TrustAndSecuritySection />
+          </View>
+
           <View style={[styles.footer, { marginTop: 12 }]}>
             <View>
               <T style={styles.footerLeftTop}>TJ-DV — Taxi Jeune sur Rendez-Vous</T>
@@ -449,26 +589,98 @@ export default function HeroPage() {
     </ImageBackground>
   );
 }
+function Feature({ icon, text, S, scale, T, isPhone, isLast }) {
+  // Mobile - VERTICAL layout with MUCH BIGGER icons
+  if (isPhone) {
+    const iconSize = Math.round(80 * scale); // ✅ INCREASED from 70 to 90 for MUCH BIGGER icons
+    const circleSize = Math.round(90 * scale); // Circle matches icon size
+    
+    return (
+      <View
+        style={[
+          styles.featureItem,
+          {
+            width: "100%",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            paddingHorizontal: 12,
+            paddingVertical: 18, // More vertical padding for bigger icons
+            borderBottomWidth: isLast ? 0 : 1,
+            borderBottomColor: "rgba(11,42,58,0.12)",
+          },
+        ]}
+      >
+        <View
+          style={[
+            styles.featureIconCircle,
+            {
+              width: circleSize * 0.6,
+              height: circleSize * 0.6,
+              marginRight: 20,
+            },
+          ]}
+        >
+          <Image
+            source={icon}
+            resizeMode="contain"
+            style={{
+              width: iconSize * 1.2, // Slightly smaller inside circle for breathing room
+              height: iconSize * 1.2,
+            }}
+          />
+        </View>
 
-/* ===== Small helper components ===== */
-function Feature({ icon, text, S, scale, T }) {
+        <T
+          style={{
+            fontSize: Math.round(20 * scale), // Bigger text to match
+            lineHeight: Math.round(24 * scale),
+            fontWeight: "900",
+            color: "#0B2A3A",
+            textAlign: "left",
+            flex: 1,
+          }}
+        >
+          {text}
+        </T>
+      </View>
+    );
+  }
+
+ 
+  // Desktop - HORIZONTAL layout
   return (
-    <View style={styles.featureItem}>
-      <Image
-        source={icon}
-        style={{ width: S.featureIcon, height: S.featureIcon, marginRight: Math.round(6 * scale) }}
-        resizeMode="contain"
-      />
-      <T style={[styles.featureText, { fontSize: S.featureText }]}>{text}</T>
+    <View style={[styles.featureItem, { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center" }]}>
+      <View style={{ marginRight: Math.round(10 * scale) }}>
+        <Image
+          source={icon}
+          resizeMode="contain"
+          style={{ width: S.featureIcon, height: S.featureIcon }}
+        />
+      </View>
+      <T style={[styles.featureText, { fontSize: S.featureText }]}>
+        {text}
+      </T>
     </View>
   );
 }
 
+// Replace your Step component with this
 function Step({ icon, label, S, T }) {
   return (
     <View style={styles.step}>
-      <View style={styles.iconMask}>
-        <Image source={icon} style={{ width: S.stepIcon, height: S.stepIcon }} resizeMode="contain" />
+      <View style={[styles.iconMask, { 
+        paddingHorizontal: 4,  // Reduced from 8
+        paddingVertical: 2,     // Reduced from 4
+      }]}>
+        <Image 
+          source={icon} 
+          style={{ 
+            width: S.stepIcon * 0.75,  // Slightly smaller icon to fit in reduced background
+            height: S.stepIcon * 0.75 
+          }} 
+          resizeMode="contain" 
+        />
       </View>
       <T style={[styles.stepText, { fontSize: S.stepText }]}>{label}</T>
     </View>
@@ -484,7 +696,7 @@ const styles = StyleSheet.create({
   bgImg: { alignSelf: "center" },
   scroll: {
     flexGrow: 1,
-    paddingTop:10,// ✅ was 10 (try 18–28)
+    paddingTop: 10,
     paddingBottom: 18,
     alignItems: "center",
   },
@@ -539,10 +751,23 @@ const styles = StyleSheet.create({
 
   payment: { fontWeight: "800", color: "#0B2A3A", opacity: 0.85 },
 
+  featuresWhiteBox: {
+    width: "100%",
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.70)",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
+  },
+
   panelGroup: {
     width: "100%",
     maxWidth: 1000,
-    backgroundColor: "rgba(255, 230, 235, 0.35)",
+    
     borderWidth: 2,
     borderColor: "rgba(255,255,255,0.45)",
     overflow: "hidden",
@@ -596,9 +821,23 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.16)",
   },
 
-  cardTitleRow: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
-  shortPinkLine: { height: 3, borderRadius: 99, backgroundColor: "rgba(231,30,111,0.55)" },
-  cardTitle: { marginHorizontal: 10, fontWeight: "900", color: "#0B2A3A" },
+  cardTitleRow: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  shortPinkLine: { 
+    height: 3, 
+    borderRadius: 99, 
+    backgroundColor: "rgba(253, 250, 251, 0.55)",
+  },
+  cardTitle: { 
+    marginHorizontal: 10, 
+    fontWeight: "900", 
+    color: "#0B2A3A",
+    flexShrink: 1,
+  },
 
   iconMask: {
     borderRadius: 999,
@@ -624,7 +863,56 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  stepVRow: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+  },
+
+  stepVCircle: {
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.60)",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.75)",
+    shadowColor: "#000",
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+
+  stepVText: {
+    flex: 1,
+    fontWeight: "900",
+    color: "#0B2A3A",
+  },
+
+  stepDivider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "rgba(11,42,58,0.12)",
+  },
+  
   cardFoot: { fontWeight: "900", textAlign: "center", color: "#0B2A3A", opacity: 0.95 },
+
+  featureIconCircle: {
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.75)",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
 
   footer: {
     width: "100%",
