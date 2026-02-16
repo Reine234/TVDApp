@@ -116,37 +116,44 @@ export default function HeroPage() {
       await Linking.openURL(webUrl);
     }
   };
-
-  return (
-    <ImageBackground
-      source={heroBgSource}
-      style={styles.bg}
-      resizeMode="cover"
-      imageStyle={[
-        styles.bgImg,
-        isPhone && {
-          resizeMode: "cover",
-          alignSelf: "center",
-          top: -24,
-          transform: [{ scale: 1.2 }],
-        },
-      ]}
+return (
+  <ImageBackground
+    source={heroBgSource}
+    style={styles.bg}
+    resizeMode="cover"
+    imageStyle={[
+      styles.bgImg,
+      isPhone && {
+        resizeMode: "cover",
+        alignSelf: "center",
+        top: -24,
+        transform: [{ scale: 1.2 }],
+      },
+    ]}
+  >
+    {/* DARK OVERLAY - ONLY AFFECTS BACKGROUND */}
+    <View style={{
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(0,0,0,0.25)', // 45% black overlay = brightness(0.55)
+    }} />
+    
+    <ScrollView
+      contentContainerStyle={styles.scroll}
+      showsVerticalScrollIndicator={false}
     >
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
+      <View
+        style={[
+          styles.wrap,
+          {
+            width: posterW,
+            maxWidth: S.maxWrap,
+            paddingHorizontal: S.padX,
+            alignSelf: "center",
+            // REMOVED zIndex: 2 - not needed
+          },
+        ]}
       >
-        <View
-          style={[
-            styles.wrap,
-            {
-              width: posterW,
-              maxWidth: S.maxWrap,
-              paddingHorizontal: S.padX,
-              alignSelf: "center",
-            },
-          ]}
-        >
+        {/* rest of your content */}
           {/* HERO TOP AREA */}
           <View style={mobileHeroWrap}>
             {/* BRAND */}
