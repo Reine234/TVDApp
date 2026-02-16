@@ -54,7 +54,7 @@ function TrustAndSecurityContent() {
   const stackCards = width < 720;
 
   // ✅ WhatsApp redirect (EDIT ONLY THIS IF YOU WANT)
-  const WHATSAPP_PHONE = "237679695205"; // <-- put your number (no +, no spaces)
+  const WHATSAPP_PHONE = "237679971134"; // <-- put your number (no +, no spaces)
   const WHATSAPP_MESSAGE ="Bonjour TJ-DV, je veux réserver un taxi sur rendez-vous.";
 
   const openWhatsApp = async () => {

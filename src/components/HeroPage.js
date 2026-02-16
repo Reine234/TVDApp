@@ -102,20 +102,23 @@ export default function HeroPage() {
     : null;
 
   const WA_NUMBER = "237679971134";
-  const WA_MESSAGE = "Bonjour TJ-DV, je veux réserver un taxi sur rendez-vous.";
+const WA_MESSAGE = "Bonjour TJ-DV, je veux réserver un taxi sur rendez-vous.";
 
-  const openWhatsApp = async () => {
-    const text = encodeURIComponent(WA_MESSAGE);
-    const appUrl = `whatsapp://send?phone=${WA_NUMBER}&text=${text}`;
+const openWhatsApp = async () => {
+  const text = encodeURIComponent(WA_MESSAGE);
+  
+  // Try WhatsApp direct URL first (works on most devices)
+  const appUrl = `whatsapp://send?phone=${WA_NUMBER}&text=${text}`;
+  
+  try {
+    // Try to open WhatsApp directly
+    await Linking.openURL(appUrl);
+  } catch (e) {
+    // If WhatsApp direct fails, try the web URL as fallback
     const webUrl = `https://wa.me/${WA_NUMBER}?text=${text}`;
-
-    try {
-      const canOpen = await Linking.canOpenURL(appUrl);
-      await Linking.openURL(canOpen ? appUrl : webUrl);
-    } catch (e) {
-      await Linking.openURL(webUrl);
-    }
-  };
+    await Linking.openURL(webUrl);
+  }
+};
 return (
   <ImageBackground
     source={heroBgSource}
@@ -134,7 +137,7 @@ return (
     {/* DARK OVERLAY - ONLY AFFECTS BACKGROUND */}
     <View style={{
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(0,0,0,0.25)', // 45% black overlay = brightness(0.55)
+      backgroundColor: 'rgba(0,0,0,0.15)', // 45% black overlay = brightness(0.55)
     }} />
     
     <ScrollView
