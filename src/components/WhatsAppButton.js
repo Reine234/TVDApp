@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, Image, StyleSheet, Linking, Alert } from "react
 
 
 export default function WhatsAppButton({
-  phone = "237679695205", // ✅ put your real number here once
+  phone = "237679971134", // ✅ put your real number here once
   message = "Bonjour TJ-DV, je veux réserver un taxi sur rendez-vous.",
   label = "Réserver sur WhatsApp",
   style,

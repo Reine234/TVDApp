@@ -101,8 +101,8 @@ export default function HeroPage() {
       }
     : null;
 
-  const WA_NUMBER = "237679695205";
-  const WA_MESSAGE = "Bonjour ";
+  const WA_NUMBER = "237679971134";
+  const WA_MESSAGE = "Bonjour TJ-DV, je veux réserver un taxi sur rendez-vous.";
 
   const openWhatsApp = async () => {
     const text = encodeURIComponent(WA_MESSAGE);
@@ -128,7 +128,7 @@ export default function HeroPage() {
           resizeMode: "cover",
           alignSelf: "center",
           top: -24,
-          transform: [{ scale: 1.05 }],
+          transform: [{ scale: 1.2 }],
         },
       ]}
     >
@@ -370,6 +370,8 @@ export default function HeroPage() {
               💰 Paiement uniquement après la course
             </T>
           </View>
+
+
 
           {/* PANEL GROUP - FIXED: "Comment ça marche" now OUTSIDE the white card */}
           <View
